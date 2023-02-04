@@ -1,48 +1,44 @@
-# Converting Spreadsheets to Campaign Logger format.
-import pandas, openpyxl, os
+import functions
+import PySimpleGUI as sg
+import pandas
 
-valid_choice = False
-while not valid_choice:
-    choice = input("Choose campaign and table to convert. Separate by a semicolon: ")
+SUPPORTED_FORMATS = ['xls', 'xlsx']
 
-    try:
-        campaign, table = choice.split(";")
-    except (ValueError, IndexError):
-        print("Invalid choice. Please try again:")
-        continue
+sg.theme("DarkPurple")
 
-    if campaign == "Fallow Men":
-        base_dir = "./RPGs/Campaigns/Fallow Men/"
-    elif campaign == "Cidri":
-        base_dir = "./RPGs/Campaigns/Cidri (TFT)/"
-    else:
-        print("Invalid campaign choice. Try again.")
-        continue
+file_choice_label = sg.Text("Select desired spreadsheet workbook: ")
+file_choice_input = sg.Input()
+file_choice_button = sg.FileBrowse("Choose", key="filepath")
 
-    if table in ("Plotline", "Loopy Plans"):
-        file_dir = "Plots/Campaign-Planning.xlsx"
-    elif table in ("Treasure Table"):
-        # elif table in ("Treasure Table", "Treasures"):
-        file_dir = "Quartermaster/Quartermaster.xlsx"
-    else:
-        print("Invalid table choice. Try again.")
-        continue
+table_choice_label = sg.Text("Enter the name of the desired table as it "
+                              "appears on the tab in the workbook:")
+table_choice_input = sg.InputText(tooltip="table name", key="table")
 
-    valid_choice = True
+output_dir_label = sg.Text("Pick the desired destination directory:")
+output_dir_input = sg.Input()
+output_dir_button = sg.FolderBrowse("Choose", key="dest_folder")
 
-filepath = base_dir + file_dir
-df = pandas.read_excel(filepath, sheet_name=table, na_filter=False)
-output_lines = []
-print(df.shape)
-for idx in range(df.shape[0]):
-    line = ""
-    row = df.loc[idx]
-    for col in df.columns:
-        line = f"{line}|| {row[col]} "
-    line = line + '\n'
-    output_lines.append(line)
+output_file_label = sg.Text("Enter the name of the text file output:")
+output_file_choice = sg.InputText(default_text="output",
+                                  key="filename")
 
-with open("output.txt", "w") as f:
-    for line in output_lines:
-        print(line)
-        f.writelines(line)
+convert_button = sg.Button("Convert Table")
+
+layout_col1 = [[file_choice_label],
+               [file_choice_input],
+               [file_choice_button]]
+
+layout_col2 = [[output_file_label],
+               [output_dir_input],
+               [output_dir_button]]
+
+col1 = sg.Column(layout=layout_col1)
+col2 = sg.Column(layout=layout_col2)
+
+window = sg.Window("Table Converter",
+                   layout=[[col1, col2],
+                           [table_choice_label],
+                           [table_choice_input, convert_button]])
+
+window.read()
+window.close()
