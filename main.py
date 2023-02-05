@@ -7,16 +7,24 @@ SUPPORTED_FORMATS = ['xls', 'xlsx']
 sg.theme("Black")
 
 file_choice_label = sg.Text("Select desired spreadsheet workbook: ")
-file_choice_input = sg.Input(key="file_choice")
-file_choice_button = sg.FileBrowse("Choose", key="filepath")
+file_choice_input = sg.Input(key="file_choice",
+                             enable_events=True,
+                             visible=True)
+file_choice_button = sg.FileBrowse("Choose",
+                                   key="filepath",
+                                   target="file_choice")
 
 table_choice_label1 = sg.Text("Enter the name of the desired table as it appears")
 table_choice_label2 = sg.Text("on the tab in the workbook:")
 table_choice_input = sg.InputText(tooltip="table name", key="table")
 
 output_dir_label = sg.Text("Pick the desired destination directory:")
-output_dir_input = sg.Input(key="folder_choice")
-output_dir_button = sg.FolderBrowse("Choose", key="dest_folder")
+output_dir_input = sg.Input(key="folder_choice",
+                            enable_events=True,
+                            visible=True)
+output_dir_button = sg.FolderBrowse("Choose",
+                                    key="dest_folder",
+                                    target="folder_choice")
 
 output_file_label = sg.Text("Enter the name of the text file output:")
 output_file_choice = sg.InputText(default_text="output",
