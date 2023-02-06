@@ -15,7 +15,7 @@ def get_table(filepath, table_name=""):
     extension = Path(filepath).suffix
     filename = Path(filepath).name
     match extension:
-        case "csv":
+        case ".csv":
             try:
                 df = pd.read_csv(filepath, na_filter=False)
             except UnicodeError:
@@ -24,7 +24,7 @@ def get_table(filepath, table_name=""):
                 return f"Unexpected {err=}, {type(err)=}."
             else:
                 return df
-        case "xls" | "xlsx":
+        case ".xls" | ".xlsx":
             try:
                 df = pd.read_excel(filepath, sheet_name=table_name,
                                    na_filter=False)
@@ -38,6 +38,7 @@ def get_table(filepath, table_name=""):
         case _:
             return f"{filename} has invalid extension {extension}."
 
+
 def write_output(dest_dir, output_file, output_lines):
     """This function writes the converted rows as lines of text in the specified
     output_file. If the file extension is not specified, it will use txt. The
@@ -50,8 +51,8 @@ def write_output(dest_dir, output_file, output_lines):
     extension = Path(output_file).suffix
     if extension == "":
         extension = "txt"
-        targetfile = f"{output_file}.{extension}"
-    filepath = f"{dest_dir}/{targetfile}"
+    target_file = f"{output_file}.{extension}"
+    filepath = f"{dest_dir}/{target_file}"
     with open(filepath, "w") as f:
         for line in output_lines:
             f.writelines(line)

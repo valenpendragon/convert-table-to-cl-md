@@ -28,7 +28,7 @@ output_file_label = sg.Text("Enter the name of the text file output:")
 output_file_choice = sg.InputText(default_text="output",
                                   key="filename")
 
-success_label = sg.Text(key="completed", text_color="white")
+result_label = sg.Text(key="results", text_color="white")
 
 convert_button = sg.Button("Convert Table")
 quit_button = sg.Button("Quit", key="quit")
@@ -52,7 +52,7 @@ col2 = sg.Column(layout=layout_col2)
 
 window = sg.Window("Table Converter",
                    layout=[[col1, col2],
-                           [success_label]])
+                           [result_label]])
 
 while True:
     event, values = window.read()
@@ -66,18 +66,25 @@ while True:
             df = functions.get_table(filepath, table)
             print(df)
             if not isinstance(df, pd.DataFrame):
-                window["success_label"].update(value=df, text_color="darkred")
+                window["results"].update(value=df, text_color="darkred")
             else:
                 output_lines = []
+                top_line = ""
+                for col in df.columns:
+                    top_line = f"{top_line}|| {col}"
+                top_line = top_line + "\n"
+                output_lines.append(top_line)
                 for idx in range(df.shape[0]):
                     line = ""
                     row = df.loc[idx]
+                    # Get the column headers for the first row.
                     for col in df.columns:
                         line = f"{line}|| {row[col]} "
                     line = line + '\n'
                     output_lines.append(line)
                 functions.write_output(dest_folder, filename, output_lines)
-                window["success_label"].update(value="Conversion Completed.")
+                window["results"].update(value="Conversion Completed.",
+                                         text_color="white")
         case sg.WIN_CLOSED:
             break
         case "quit":
