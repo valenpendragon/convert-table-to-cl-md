@@ -1,8 +1,6 @@
 import functions
 import PySimpleGUI as sg
-import pandas
-
-SUPPORTED_FORMATS = ['xls', 'xlsx']
+import pandas as pd
 
 sg.theme("Black")
 
@@ -59,13 +57,30 @@ window = sg.Window("Table Converter",
 while True:
     event, values = window.read()
     print(event, values)
-    window["folder_choice"].update(value=values["dest_folder"])
-    window["file_choice"].update(value=values["filepath"])
     match event:
+        case "Convert Table":
+            filepath = values["filepath"]
+            table = values["table"]
+            dest_folder = values["dest_folder"]
+            filename = values["filename"]
+            df = functions.get_table(filepath, table)
+            print(df)
+            if not isinstance(df, pd.DataFrame):
+                window["success_label"].update(value=df, text_color="darkred")
+            else:
+                output_lines = []
+                for idx in range(df.shape[0]):
+                    line = ""
+                    row = df.loc[idx]
+                    for col in df.columns:
+                        line = f"{line}|| {row[col]} "
+                    line = line + '\n'
+                    output_lines.append(line)
+                functions.write_output(dest_folder, filename, output_lines)
+                window["success_label"].update(value="Conversion Completed.")
         case sg.WIN_CLOSED:
             break
         case "quit":
             break
-
 
 window.close()
